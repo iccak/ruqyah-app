@@ -64,8 +64,8 @@ class CustomRuqyahApp extends StatelessWidget {
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-          bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black80),
-          bodyMedium: TextStyle(fontSize: 18, color: Colors.black80),
+          bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black87),
+          bodyMedium: TextStyle(fontSize: 18, color: Colors.black87),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
