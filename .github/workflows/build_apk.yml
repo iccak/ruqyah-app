@@ -30,17 +30,21 @@ jobs:
 
       - name: Create Complete Flutter Skeleton & Merge Files
         run: |
-          # 1. إنشاء مشروع فلتر كامل بالنظام الحديث تلقائياً
+          # 1. إنشاء مشروع فلتر كامل
           flutter create --org com.ruqyah --project-name custom_ruqyah_player workspace_app
           
           # 2. دمج ملفاتك التي أنشأتها داخل المشروع الجديد
           cp -R app_sources/lib workspace_app/
           cp app_sources/pubspec.yaml workspace_app/
           
-          # 3. إحلال ملف AndroidManifest الخاص بك
+          # 3. إحلال ملف AndroidManifest
           if [ -f "app_sources/android/app/src/main/AndroidManifest.xml" ]; then
             cp app_sources/android/app/src/main/AndroidManifest.xml workspace_app/android/app/src/main/
           fi
+
+          # 4. رفع compileSdk إلى 36 تلقائياً للتوافق مع المكتبات الحديثة
+          sed -i 's/flutter.compileSdkVersion/36/g' workspace_app/android/app/build.gradle
+          sed -i 's/compileSdk = .*/compileSdk = 36/g' workspace_app/android/app/build.gradle
 
       - name: Install Project Dependencies
         run: |
