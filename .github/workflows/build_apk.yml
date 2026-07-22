@@ -28,36 +28,26 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Create Complete Flutter Skeleton & Force Android Settings
+      - name: Create Clean Workspace & Force Gradle Fixes
         run: |
-          # 1. إنشاء هيكل مشروع Flutter
+          # 1. إنشاء مشروع فلتر حديث ونظيف
           flutter create --org com.ruqyah --project-name custom_ruqyah_player workspace_app
           
-          # 2. نقل ملفاتك للمشروع
+          # 2. نسخ ملفات الكود فقط
           cp -R app_sources/lib workspace_app/
-          cp app_sources/pubspec.yaml workspace_app/
           
+          # 3. إحلال ملف AndroidManifest
           if [ -f "app_sources/android/app/src/main/AndroidManifest.xml" ]; then
             cp app_sources/android/app/src/main/AndroidManifest.xml workspace_app/android/app/src/main/
           fi
 
-          # 3. إجبار compileSdk = 36 لكل المكتبات والمشروع الرئيسي في Gradle
-          cat << 'EOF' >> workspace_app/android/build.gradle
-          subprojects {
-              afterEvaluate { project ->
-                  if (project.hasProperty('android')) {
-                      project.android {
-                          compileSdkVersion 36
-                      }
-                  }
-              }
-          }
-          EOF
-
-      - name: Install Project Dependencies
-        run: |
+          # 4. تثبيت المكتبات المتوافقة تلقائياً بدون تعارض في الإصدارات
           cd workspace_app
-          flutter pub get
+          flutter pub add just_audio audio_service path_provider file_picker hive hive_flutter uuid flutter_localizations --sdk=flutter
+          flutter pub add --dev build_runner hive_generator flutter_lints
+
+          # 5. فرض compileSdk 36 على كافة المكتبات المعتمدة
+          echo "subprojects { afterEvaluate { project -> if (project.hasProperty('android')) { project.android { compileSdkVersion 36 } } } }" >> android/build.gradle
 
       - name: Generate Hive Models Adapter
         run: |
