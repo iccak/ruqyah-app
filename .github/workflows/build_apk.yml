@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+        with:
+          path: 'app_sources'
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -26,17 +28,37 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Create Complete Flutter Skeleton & Merge Files
+        run: |
+          # 1. إنشاء مشروع فلتر كامل بالنظام الحديث تلقائياً
+          flutter create --org com.ruqyah --project-name custom_ruqyah_player workspace_app
+          
+          # 2. دمج ملفاتك التي أنشأتها داخل المشروع الجديد
+          cp -R app_sources/lib workspace_app/
+          cp app_sources/pubspec.yaml workspace_app/
+          
+          # 3. إحلال ملف AndroidManifest الخاص بك
+          if [ -f "app_sources/android/app/src/main/AndroidManifest.xml" ]; then
+            cp app_sources/android/app/src/main/AndroidManifest.xml workspace_app/android/app/src/main/
+          fi
+
       - name: Install Project Dependencies
-        run: flutter pub get
+        run: |
+          cd workspace_app
+          flutter pub get
 
       - name: Generate Hive Models Adapter
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: |
+          cd workspace_app
+          flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Build Release APK
-        run: flutter build apk --release
+        run: |
+          cd workspace_app
+          flutter build apk --release
 
       - name: Upload APK Binary Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ruqyah-app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: workspace_app/build/app/outputs/flutter-apk/app-release.apk
