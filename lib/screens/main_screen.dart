@@ -121,7 +121,7 @@ class MainScreen extends StatelessWidget {
                           children: [
                             Text(
                               playlist.name,
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black90),
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
                             ),
                             const SizedBox(height: 8),
                             Text(
