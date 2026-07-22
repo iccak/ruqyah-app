@@ -28,23 +28,31 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Create Complete Flutter Skeleton & Merge Files
+      - name: Create Complete Flutter Skeleton & Force Android Settings
         run: |
-          # 1. إنشاء مشروع فلتر جديد
+          # 1. إنشاء هيكل مشروع Flutter
           flutter create --org com.ruqyah --project-name custom_ruqyah_player workspace_app
           
-          # 2. نسخ الملفات الخاصة بك داخل المشروع
+          # 2. نقل ملفاتك للمشروع
           cp -R app_sources/lib workspace_app/
           cp app_sources/pubspec.yaml workspace_app/
           
-          # 3. إحلال ملف AndroidManifest إذا وجد
           if [ -f "app_sources/android/app/src/main/AndroidManifest.xml" ]; then
             cp app_sources/android/app/src/main/AndroidManifest.xml workspace_app/android/app/src/main/
           fi
 
-          # 4. تعديل compileSdk إلى 36 بأسلوب يتوافق مع جميع صيغ gradle الحديثة والقديمة
-          find workspace_app/android -type f \( -name "build.gradle" -o -name "build.gradle.kts" \) -exec sed -i 's/compileSdk = .*/compileSdk = 36/g' {} +
-          find workspace_app/android -type f \( -name "build.gradle" -o -name "build.gradle.kts" \) -exec sed -i 's/flutter.compileSdkVersion/36/g' {} +
+          # 3. إجبار compileSdk = 36 لكل المكتبات والمشروع الرئيسي في Gradle
+          cat << 'EOF' >> workspace_app/android/build.gradle
+          subprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty('android')) {
+                      project.android {
+                          compileSdkVersion 36
+                      }
+                  }
+              }
+          }
+          EOF
 
       - name: Install Project Dependencies
         run: |
